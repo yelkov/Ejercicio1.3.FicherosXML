@@ -36,5 +36,6 @@ public class Persona implements Serializable {
     public void guardar(String ruta) throws IOException {
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(ruta + ".bin", true));
         oos.writeObject(this);
+        oos.close();
     }
 }
