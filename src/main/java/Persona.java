@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Path;
+import java.util.List;
 
 public class Persona implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -33,9 +34,4 @@ public class Persona implements Serializable {
         this.edad = edad;
     }
 
-    public void guardar(String ruta) throws IOException {
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(ruta + ".bin", true));
-        oos.writeObject(this);
-        oos.close();
-    }
 }

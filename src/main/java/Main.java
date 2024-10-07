@@ -1,4 +1,6 @@
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,12 +17,17 @@ public class Main {
         grupo.add(david);
         grupo.add(evan);
 
-        for (Persona persona : grupo) {
-           try {
-               persona.guardar("src/main/resources/personas");
-           }catch (IOException e){
-               System.out.println("Error al guardar el archivo." + e.getMessage());
-           }
+        guardarPersonas(grupo);
+
+    }
+    public  static void guardarPersonas(List<Persona> personas) {
+
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("src/main/resources/personas.bin"))){
+            for (Persona persona : personas){
+                oos.writeObject(persona);
+            }
+        }catch (IOException e){
+            System.out.println("Error al guardar" + e.getMessage());
         }
 
     }
