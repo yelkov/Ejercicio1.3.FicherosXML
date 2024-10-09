@@ -1,7 +1,4 @@
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,9 +14,12 @@ import java.util.List;
 
 public class CrearXmlPersonas {
 
+    private static String RUTA_BIN = "src/main/resources/personas.bin";
+    private static String RUTA_XML = "src/main/resources/personas.xml";
+
     public static void main(String[] args) {
         List<Persona> personas = new ArrayList<Persona>();
-        try(ObjectInputStream lector = new ObjectInputStream(new FileInputStream("src/main/resources/personas.bin"))){
+        try(ObjectInputStream lector = new ObjectInputStream(new FileInputStream(RUTA_BIN))){
             while (true){
                 Object o = lector.readObject();
                 if(o instanceof Persona){
@@ -35,6 +35,13 @@ public class CrearXmlPersonas {
             System.out.println("No se puede leer el archivo "+ e.getMessage());
         }
         crearXml(personas);
+        /*
+        List<Persona> personasLeidas = leerPersonasXml();
+        for (Persona persona : personasLeidas){
+            System.out.println(persona.toString());
+        }
+        */
+
     }
 
     public static void crearXml(List<Persona> personas){
@@ -64,12 +71,38 @@ public class CrearXmlPersonas {
 
             }
             Source source = new DOMSource(document);
-            Result resultado = new StreamResult(new File("src/main/resources/personas.xml"));
+            Result resultado = new StreamResult(new File(RUTA_XML));
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.transform(source, resultado);
 
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static List<Persona> leerPersonasXml(){
+        List<Persona> personas = new ArrayList<>();
+        try{
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document documento = builder.parse(new File(RUTA_XML));
+            documento.getDocumentElement().normalize();
+
+            NodeList nodosPersonas = documento.getElementsByTagName("persona");
+
+            for(int i = 0; i < nodosPersonas.getLength(); i++){
+                Element elementoPersona = (Element) nodosPersonas.item(i);
+                Element elementoNombre = (Element) elementoPersona.getElementsByTagName("nombre").item(0);
+                String nombre = elementoNombre.getTextContent();
+                Element elementoEdad = (Element) elementoPersona.getElementsByTagName("edad").item(0);
+                String edad = elementoEdad.getTextContent();
+                personas.add(new Persona(nombre, Integer.parseInt(edad)));
+            }
+
+
+        } catch (Exception e) {
+            System.out.println("No se puede leer el archivo XML " + e.getMessage());
+        }
+        return personas;
     }
 }

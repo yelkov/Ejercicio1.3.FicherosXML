@@ -34,4 +34,11 @@ public class Persona implements Serializable {
         this.edad = edad;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Nombre: " + nombre);
+        sb.append("\tEdad: " + edad);
+        return sb.toString();
+    }
 }
