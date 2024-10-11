@@ -1,4 +1,4 @@
-package pedidos;
+package xmlEj.pedidos;
 
 import java.io.Serializable;
 

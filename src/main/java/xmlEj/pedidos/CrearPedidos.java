@@ -1,24 +1,25 @@
-package pedidos;
+package xmlEj.pedidos;
 
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
+import xmlEj.XmlPrinter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stax.StAXResult;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class CrearPedidos {
-    private static String RUTA_DAT = "src/main/resources/pedidos/pedidos.dat";
-    private static String RUTA_XML = "src/main/resources/pedidos/pedidos.xml";
+    private static String RUTA_DAT = "src/main/resources/xmlEj/pedidos/pedidos.dat";
+    private static String RUTA_XML = "src/main/resources/xmlEj/pedidos/pedidos.xml";
 
     public static void main(String[] args) {
         Producto monitor = new Producto(100, "Monitor",100.0);
@@ -58,7 +59,15 @@ public class CrearPedidos {
         System.out.println(pedidosLeidos.toString());
         crearXmlPedidos(pedidosLeidos);
 
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\nDesea printar un xml creado? (s/N)");
+        String opcion = sc.nextLine();
 
+        if (opcion.equals("s")) {
+            XmlPrinter.main(args);
+        }else{
+            System.out.println("\nHasta luego!");
+        }
     }
 
     public static void guardaPedidosDat(List<Pedido> pedidos){
@@ -154,10 +163,9 @@ public class CrearPedidos {
             Result resultado = new StreamResult(new File(RUTA_XML));
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             transformer.transform(source,resultado);
 
-            System.out.println("Se ha guardado el xml de manera correcta.");
+            System.out.println("\nSe ha guardado el xml de manera correcta.");
 
         } catch (ParserConfigurationException e) {
             e.printStackTrace();

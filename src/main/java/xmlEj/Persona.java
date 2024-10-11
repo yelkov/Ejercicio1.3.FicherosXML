@@ -1,9 +1,6 @@
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+package xmlEj;
+
 import java.io.Serializable;
-import java.nio.file.Path;
-import java.util.List;
 
 public class Persona implements Serializable {
     private static final long serialVersionUID = 1L;

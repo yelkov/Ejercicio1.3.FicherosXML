@@ -1,4 +1,8 @@
+package xmlEj;
+
 import org.w3c.dom.Document;
+
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -11,7 +15,7 @@ import java.util.Scanner;
 public class XmlPrinter {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Ingrese un archivo XML: ");
+        System.out.println("Ingrese la ruta de un archivo xml: ");
         String archivo = sc.nextLine();
 
         if (archivo.endsWith(".xml")) {
@@ -33,7 +37,7 @@ public class XmlPrinter {
         }
     }
 
-    private static void printNodes(NodeList nodeList, int nivel) {
+    public static void printNodes(NodeList nodeList, int nivel) {
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {

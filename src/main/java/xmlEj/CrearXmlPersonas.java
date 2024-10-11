@@ -1,3 +1,5 @@
+package xmlEj;
+
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -36,8 +38,8 @@ public class CrearXmlPersonas {
         }
         crearXml(personas);
         /*
-        List<Persona> personasLeidas = leerPersonasXml();
-        for (Persona persona : personasLeidas){
+        List<xmlEj.Persona> personasLeidas = leerPersonasXml();
+        for (xmlEj.Persona persona : personasLeidas){
             System.out.println(persona.toString());
         }
         */
