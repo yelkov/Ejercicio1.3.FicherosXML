@@ -6,9 +6,7 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class ContadorXml {
     public static void main(String[] args) {
@@ -22,15 +20,13 @@ public class ContadorXml {
                 DocumentBuilder dBuilder = dbf.newDocumentBuilder();
                 Document doc = dBuilder.parse(new File(archivo));
 
-                Integer contador = 0;
 
                 NodeList nodeList = doc.getChildNodes();
-                List<String> etiquetas = new ArrayList<>();
+                Map<String, Integer> etiquetas = new HashMap<>();
 
-                contador = contarElementos(nodeList,contador,etiquetas);
+                etiquetas = contarElementos(nodeList,etiquetas);
 
-                System.out.println("El número de elementos del xml es: " + contador.toString());
-                System.out.println("Las etiquetas que se han encontrado son: ");
+                System.out.println("El xml contiene: " + etiquetas.size() + " etiquetas diferentes.");
                 printarEtiquetas(etiquetas);
 
             } catch (Exception e) {
@@ -41,27 +37,25 @@ public class ContadorXml {
         }
     }
 
-    public static Integer contarElementos(NodeList nodeList, Integer contador, List<String> etiquetas){
+    public static Map<String,Integer> contarElementos(NodeList nodeList, Map<String, Integer> etiquetas){
         for (int i = 0; i < nodeList.getLength(); i++){
             Node node = nodeList.item(i);
             if(node.getNodeType() == Node.ELEMENT_NODE){
                 Element element = (Element) node;
-                if(!etiquetas.contains(element.getNodeName())){
-                    contador += 1;
-                    etiquetas.add(element.getNodeName());
-                }
+                etiquetas.computeIfAbsent(element.getTagName(), k -> 0);
+                etiquetas.computeIfPresent(element.getTagName(), (k, v) -> v + 1);
 
                 if (element.hasChildNodes()){
                     NodeList elementChilds = element.getChildNodes();
-                    contador = contarElementos(elementChilds,contador,etiquetas);
+                    contarElementos(elementChilds,etiquetas);
                 }
             }
         }
-        return contador;
+        return etiquetas;
     }
-    public static void printarEtiquetas(List<String> etiquetas){
-        for (String etiqueta : etiquetas){
-            System.out.println(etiqueta);
+    public static void printarEtiquetas(Map<String,Integer> etiquetas){
+        for (Map.Entry<String,Integer> entry  : etiquetas.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
         }
     }
 }
