@@ -1,11 +1,24 @@
 package pedidos;
 
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stax.StAXResult;
+import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CrearPedidos {
     private static String RUTA_DAT = "src/main/resources/pedidos/pedidos.dat";
+    private static String RUTA_XML = "src/main/resources/pedidos/pedidos.xml";
 
     public static void main(String[] args) {
         Producto monitor = new Producto(100, "Monitor",100.0);
@@ -15,27 +28,22 @@ public class CrearPedidos {
         Producto teclado = new Producto(104, "Teclado",200.0);
 
         Pedido pedido1 = new Pedido(1,"Cliente1");
-        pedido1.addProducto(monitor);
-        pedido1.addProducto(raton);
+        pedido1.addProducto(monitor).addProducto(raton);
 
         Pedido pedido2 = new Pedido(2,"Cliente2");
-        pedido2.addProducto(portatil);
-        pedido2.addProducto(tablet);
+        pedido2.addProducto(portatil).addProducto(tablet);
 
         Pedido pedido3 = new Pedido(3,"Cliente2");
-        pedido3.addProducto(portatil);
-        pedido3.addProducto(tablet);
+        pedido3.addProducto(portatil).addProducto(tablet);
 
         Pedido pedido4 = new Pedido(4,"Cliente3");
-        pedido4.addProducto(monitor);
-        pedido4.addProducto(raton);
+        pedido4.addProducto(monitor).addProducto(raton);
 
         Pedido pedido5 = new Pedido(5,"Cliente4");
         pedido5.addProducto(teclado);
 
         Pedido pedido6 = new Pedido(6,"Cliente5");
-        pedido6.addProducto(monitor);
-        pedido6.addProducto(raton);
+        pedido6.addProducto(monitor).addProducto(raton);
 
         List<Pedido> pedidos = new ArrayList<Pedido>();
         pedidos.add(pedido1);
@@ -48,6 +56,8 @@ public class CrearPedidos {
         guardaPedidosDat(pedidos);
         List<Pedido> pedidosLeidos = leerPedidosDat(RUTA_DAT);
         System.out.println(pedidosLeidos.toString());
+        crearXmlPedidos(pedidosLeidos);
+
 
     }
 
@@ -66,16 +76,17 @@ public class CrearPedidos {
 
     public static List<Pedido> leerPedidosDat(String ruta){
         List<Pedido> pedidos = new ArrayList<>();
-        try(ObjectInputStream lector = new ObjectInputStream(new FileInputStream(ruta))){
-            while(true){
+
+
+        try(FileInputStream fis = new FileInputStream(ruta);
+            ObjectInputStream lector = new ObjectInputStream(fis)){
+            while(fis.available()>0){
                 Object o = lector.readObject();
                 if(o instanceof Pedido){
                     pedidos.add((Pedido)o);
                 }
             }
 
-        }catch (EOFException e){
-            System.out.println("Archivo leído.");
         }
         catch (IOException e) {
             System.out.println("Error al leer el .dat");
@@ -85,6 +96,78 @@ public class CrearPedidos {
             System.out.println("No se encuentra el .dat");
         }
         return pedidos;
+    }
+
+    public static void crearXmlPedidos(List<Pedido> pedidos) {
+        try{
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            DOMImplementation domImpl = db.getDOMImplementation();
+            Document doc = domImpl.createDocument(null, "pedidos",null);
+            doc.setXmlVersion("1.0");
+
+            Element raiz = doc.getDocumentElement();
+            for (Pedido pedido : pedidos) {
+                Element elementoPedido = doc.createElement("pedido");
+                raiz.appendChild(elementoPedido);
+
+                Element idPedidoElemento = doc.createElement("idPedido");
+                elementoPedido.appendChild(idPedidoElemento);
+
+                Text textoIdPedido = doc.createTextNode(pedido.getIdPedido().toString());
+                idPedidoElemento.appendChild(textoIdPedido);
+
+                Element nombreClienteElemento = doc.createElement("nombreCliente");
+                elementoPedido.appendChild(nombreClienteElemento);
+
+                Text textoNombreCliente = doc.createTextNode(pedido.getNombreCliente());
+                nombreClienteElemento.appendChild(textoNombreCliente);
+
+                Element elementoProductos = doc.createElement("productos");
+                elementoPedido.appendChild(elementoProductos);
+
+                for ( Producto producto : pedido.getProductos() ) {
+                    Element productoElemento = doc.createElement("producto");
+                    elementoProductos.appendChild(productoElemento);
+
+                    Element idProductoElemento = doc.createElement("idProducto");
+                    productoElemento.appendChild(idProductoElemento);
+
+                    Text textoIdProducto = doc.createTextNode(producto.getIdProducto().toString());
+                    idProductoElemento.appendChild(textoIdProducto);
+
+                    Element descripcionElemento = doc.createElement("descripcion");
+                    productoElemento.appendChild(descripcionElemento);
+
+                    Text textoDescripcion = doc.createTextNode(producto.getDescripcion());
+                    descripcionElemento.appendChild(textoDescripcion);
+
+                    Element precioElemento = doc.createElement("precio");
+                    productoElemento.appendChild(precioElemento);
+
+                    Text textoPrecio = doc.createTextNode(producto.getPrecio().toString());
+                    precioElemento.appendChild(textoPrecio);
+                }
+
+            }
+            Source source = new DOMSource(doc);
+            Result resultado = new StreamResult(new File(RUTA_XML));
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+            transformer.transform(source,resultado);
+
+            System.out.println("Se ha guardado el xml de manera correcta.");
+
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+
+        }catch (TransformerConfigurationException e) {
+            e.printStackTrace();
+
+        }catch (TransformerException e) {
+            e.printStackTrace();
+        }
     }
 
 

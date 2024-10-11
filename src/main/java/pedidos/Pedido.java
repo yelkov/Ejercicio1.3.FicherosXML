@@ -48,8 +48,9 @@ public class Pedido implements Serializable {
         this.productos = productos;
     }
 
-    public void addProducto(Producto producto) {
+    public Pedido addProducto(Producto producto) {
         this.productos.add(producto);
+        return this;
     }
 
     @Override
