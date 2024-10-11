@@ -4,7 +4,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main {
+public class GuardaPersonasBin {
     public static void main(String[] args) {
         Persona jose = new Persona("José",21);
         Persona ana = new Persona("Ana",35);
