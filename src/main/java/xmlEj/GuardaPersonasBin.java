@@ -20,6 +20,7 @@ public class GuardaPersonasBin {
         grupo.add(evan);
 
         guardarPersonas(grupo);
+        guardarDatosPersonas(grupo);
 
     }
     public  static void guardarPersonas(List<Persona> personas) {
@@ -27,6 +28,19 @@ public class GuardaPersonasBin {
         try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("src/main/resources/personas.bin"))){
             for (Persona persona : personas){
                 oos.writeObject(persona);
+            }
+        }catch (IOException e){
+            System.out.println("Error al guardar" + e.getMessage());
+        }
+
+    }
+
+    public  static void guardarDatosPersonas(List<Persona> personas) {
+
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("src/main/resources/personasDatos.bin"))){
+            for (Persona persona : personas){
+                oos.writeUTF(persona.getNombre());
+                oos.writeInt(persona.getEdad());
             }
         }catch (IOException e){
             System.out.println("Error al guardar" + e.getMessage());
